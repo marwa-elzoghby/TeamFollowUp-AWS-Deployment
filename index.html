@@ -2068,10 +2068,10 @@ window.TEAM_FOLLOW_UP_CONFIG = Object.freeze({
    try{
     const version='6.20.0';
     const [core,auth,cognitoAuth,utils]=await Promise.all([
-     import('https://esm.sh/aws-amplify@'+version),
-     import('https://esm.sh/aws-amplify@'+version+'/auth'),
-     import('https://esm.sh/aws-amplify@'+version+'/auth/cognito'),
-     import('https://esm.sh/aws-amplify@'+version+'/utils')
+     import('https://esm.sh/aws-amplify@'+version+'?bundle=false'),
+     import('https://esm.sh/aws-amplify@'+version+'/auth?bundle=false'),
+     import('https://esm.sh/aws-amplify@'+version+'/auth/cognito?bundle=false'),
+     import('https://esm.sh/aws-amplify@'+version+'/utils?bundle=false')
     ]);
     state.modules={...auth};core.Amplify.configure({Auth:{Cognito:{userPoolId:cognito.userPoolId,userPoolClientId:cognito.userPoolClientId,loginWith:{username:true},allowGuestAccess:false}}});
         // Amplify's documented defaultStorage is browser localStorage in web browsers.
