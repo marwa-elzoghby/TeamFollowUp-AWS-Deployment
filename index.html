@@ -1924,7 +1924,7 @@ window.TEAM_FOLLOW_UP_CONFIG = Object.freeze({
   catch(e){setError(copy.unknown);}
   finally{setBusy(false);}
  }
- function isConfigured(){if(!(typeof cognito.userPoolId==='string'&&/^[-\\w]+_[A-Za-z0-9]+$/.test(cognito.userPoolId)&&typeof cognito.userPoolClientId==='string'&&cognito.userPoolClientId.length>8&&!/REPLACE|YOUR_|<|>/i.test(cognito.userPoolClientId)&&!/REPLACE|YOUR_|<|>/i.test(cognito.userPoolId)))return false;try{const api=new URL(String(cfg.apiBaseUrl||'')),ws=new URL(String(cfg.realtimeWebSocketUrl||''));return api.protocol==='https:'&&!api.username&&!api.password&&!api.search&&!api.hash&&['','/'].includes(api.pathname)&&ws.protocol==='wss:'&&!ws.username&&!ws.password&&!ws.search&&!ws.hash&&ws.pathname!=='/';}catch(error){return false;}}
+ function isConfigured(){if(!(typeof cognito.userPoolId==='string'&&/^[-\w]+_[A-Za-z0-9]+$/.test(cognito.userPoolId)&&typeof cognito.userPoolClientId==='string'&&cognito.userPoolClientId.length>8&&!/REPLACE|YOUR_|<|>/i.test(cognito.userPoolClientId)&&!/REPLACE|YOUR_|<|>/i.test(cognito.userPoolId)))return false;try{const api=new URL(String(cfg.apiBaseUrl||'')),ws=new URL(String(cfg.realtimeWebSocketUrl||''));return api.protocol==='https:'&&!api.username&&!api.password&&!api.search&&!api.hash&&['','/'].includes(api.pathname)&&ws.protocol==='wss:'&&!ws.username&&!ws.password&&!ws.search&&!ws.hash&&ws.pathname!=='/';}catch(error){return false;}}
  function resolveTeamUserId(attributes){const customName=String(cognito.teamUserAttribute||'custom:teamUserId');const custom=String(attributes?.[customName]||'').trim();return validIds.includes(custom)?custom:null;}
  async function getCognitoAccessToken(forceRefresh=false){
   if(!state.modules)throw new Error('Cognito is not configured');
