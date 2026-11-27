@@ -2073,7 +2073,11 @@ window.TEAM_FOLLOW_UP_CONFIG = Object.freeze({
      import('https://esm.sh/aws-amplify@'+version+'/auth/cognito?bundle=false'),
      import('https://esm.sh/aws-amplify@'+version+'/utils?bundle=false')
     ]);
-    // Keep all Amplify imports on this pinned, unbundled version so their shared core dependency is a singleton. Configure it before exposing Auth methods.\n    if(!core?.Amplify||typeof core.Amplify.configure!=='function')throw new Error('Amplify core singleton is unavailable.');\n    core.Amplify.configure({Auth:{Cognito:{userPoolId:cognito.userPoolId,userPoolClientId:cognito.userPoolClientId,loginWith:{username:true,email:true},allowGuestAccess:false}}});\n    state.modules={...auth};
+    // Configure before exposing Auth methods. All imports use the same pinned,
+    // unbundled package version so they share Amplify's core singleton.
+    if(!core?.Amplify||typeof core.Amplify.configure!=='function')throw new Error('Amplify core singleton is unavailable.');
+    core.Amplify.configure({Auth:{Cognito:{userPoolId:cognito.userPoolId,userPoolClientId:cognito.userPoolClientId,loginWith:{username:true,email:true},allowGuestAccess:false}}});
+    state.modules={...auth};
         // Amplify's documented defaultStorage is browser localStorage in web browsers.
     // Keep the SDK implementation so the complete KeyValueStorage contract is retained.
     const tokenStorage=utils.defaultStorage;
