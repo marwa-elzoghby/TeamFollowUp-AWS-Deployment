@@ -5,6 +5,7 @@ frontend:
       commands:
         - nvm use 24
         - node --version
+        - npm install --no-audit --no-fund
     build:
       commands:
         - node scripts/build.mjs

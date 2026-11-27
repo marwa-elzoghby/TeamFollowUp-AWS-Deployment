@@ -20,7 +20,10 @@ const helperEnd = html.indexOf('\nconst activityRefreshRequests=new Map();', hel
 assert.ok(helperStart >= 0 && helperEnd > helperStart, 'User-specific view-state helpers must exist.');
 const helperSource = html.slice(helperStart, helperEnd);
 
-assert.match(html, /const tokenStorage=utils\.defaultStorage/, 'Cognito uses Amplify’s documented persistent browser defaultStorage.');
+assert.match(html, /const tokenStorage=amplify\.defaultStorage/, 'Cognito uses Amplify’s documented persistent browser defaultStorage from the bundled SDK instance.');
+assert.match(html, /import\('\.\/amplify-runtime\.js'\)/, 'The browser loads one local Amplify bundle rather than independent CDN module graphs.');
+assert.ok(html.indexOf('amplify.Amplify.configure(') < html.indexOf('state.modules={...amplify}'),
+  'The shared Amplify singleton is configured before Auth methods are exposed.');
 assert.ok(html.includes("CognitoIdentityServiceProvider.'+String(cognito.userPoolClientId||'')+'."),
   'Cross-tab synchronization is limited to this Cognito app client token namespace.');
 assert.ok(html.includes("window.addEventListener('storage',handleBrowserSessionStorageEvent)"),

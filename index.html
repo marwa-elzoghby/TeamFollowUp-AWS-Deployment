@@ -2066,21 +2066,13 @@ window.TEAM_FOLLOW_UP_CONFIG = Object.freeze({
    if(!isConfigured()){setError(copy.configure);$('signInSubmit').disabled=true;$('signInForgotPassword').hidden=true;return;}
    setError(copy.loading);
    try{
-    const version='6.20.0';
-    const [core,auth,cognitoAuth,utils]=await Promise.all([
-     import('https://esm.sh/aws-amplify@'+version+'?bundle=false'),
-     import('https://esm.sh/aws-amplify@'+version+'/auth?bundle=false'),
-     import('https://esm.sh/aws-amplify@'+version+'/auth/cognito?bundle=false'),
-     import('https://esm.sh/aws-amplify@'+version+'/utils?bundle=false')
-    ]);
-    // Configure before exposing Auth methods. All imports use the same pinned,
-    // unbundled package version so they share Amplify's core singleton.
-    if(!core?.Amplify||typeof core.Amplify.configure!=='function')throw new Error('Amplify core singleton is unavailable.');
-    core.Amplify.configure({Auth:{Cognito:{userPoolId:cognito.userPoolId,userPoolClientId:cognito.userPoolClientId,loginWith:{username:true,email:true},allowGuestAccess:false}}});
-    state.modules={...auth};
+    const amplify=await import('./amplify-runtime.js');
+    if(!amplify?.Amplify||typeof amplify.Amplify.configure!=='function')throw new Error('Amplify core singleton is unavailable.');
+    amplify.Amplify.configure({Auth:{Cognito:{userPoolId:cognito.userPoolId,userPoolClientId:cognito.userPoolClientId,loginWith:{username:true,email:true},allowGuestAccess:false}}});
+    state.modules={...amplify};
         // Amplify's documented defaultStorage is browser localStorage in web browsers.
     // Keep the SDK implementation so the complete KeyValueStorage contract is retained.
-    const tokenStorage=utils.defaultStorage;
+    const tokenStorage=amplify.defaultStorage;
     if(!tokenStorage||typeof tokenStorage.getItem!=='function'||typeof tokenStorage.setItem!=='function'||typeof tokenStorage.removeItem!=='function'||typeof tokenStorage.clear!=='function')throw new Error('Amplify persistent defaultStorage is unavailable.');
     const tokenStorageProbeKey='team-follow-up-cognito-storage-probe-v1';
     const tokenStorageProbeValue=String(Date.now())+'-'+Math.random().toString(36).slice(2);
@@ -2110,7 +2102,7 @@ window.TEAM_FOLLOW_UP_CONFIG = Object.freeze({
       else console.warn('Legacy Cognito token migration could not be verified; source tokens were retained and persistent storage remains configured.');
      }
     }catch(storageMigrationError){console.warn('Could not migrate legacy Cognito tokens; persistent storage remains configured and a tab-scoped fallback is disabled.',storageMigrationError);}
-    cognitoAuth.cognitoUserPoolsTokenProvider.setKeyValueStorage(tokenStorage);
+    amplify.cognitoUserPoolsTokenProvider.setKeyValueStorage(tokenStorage);
     // Cognito's localStorage token namespace is the browser-profile session.
     // Other same-origin tabs revalidate after that namespace changes.
     window.addEventListener('storage',handleBrowserSessionStorageEvent);

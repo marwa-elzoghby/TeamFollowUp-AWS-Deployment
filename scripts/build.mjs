@@ -1,4 +1,5 @@
 import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { build as bundle } from 'esbuild';
 
 const SOURCE_PATH = 'index.html';
 const OUTPUT_PATH = 'dist/index.html';
@@ -101,6 +102,16 @@ const replacement = `<script id="team-follow-up-runtime-config">\n/* Generated a
 const output = source.replace(configRegex, replacement);
 
 await mkdir('dist', { recursive: true });
+await bundle({
+  entryPoints: ['scripts/amplify-runtime.mjs'],
+  outfile: 'dist/amplify-runtime.js',
+  bundle: true,
+  format: 'esm',
+  platform: 'browser',
+  target: 'es2020',
+  minify: true,
+  legalComments: 'none',
+});
 await writeFile(OUTPUT_PATH, output, 'utf8');
 // Ship the locally bundled typefaces with the HTML artifact. Amplify deploys dist/ only.
 await cp('assets/fonts', 'dist/assets/fonts', { recursive: true, force: true });
