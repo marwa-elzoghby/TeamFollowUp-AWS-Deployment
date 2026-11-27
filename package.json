@@ -4,9 +4,7 @@
   "private": true,
   "description": "Follow-Up application for AWS Amplify Hosting, Cognito and DynamoDB-compatible API access.",
   "dependencies": {
-    "aws-amplify": "6.20.0"
-  },
-  "devDependencies": {
+    "aws-amplify": "6.20.0",
     "esbuild": "0.25.0"
   },
   "scripts": {
