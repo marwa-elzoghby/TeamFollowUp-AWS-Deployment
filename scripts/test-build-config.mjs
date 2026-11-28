@@ -79,7 +79,7 @@ assert.notEqual(invalidPool.status, 0, 'Build must reject placeholder Cognito ID
 
 for (const apiUrl of [
   'http://app-api.execute-api.us-east-1.amazonaws.com',
-  'https://app-api.execute-api.us-east-1.amazonaws.com/path',
+  'https://app-api.execute-api.us-east-1.amazonaws.com/other-stage',
   'https://user:pass@app-api.execute-api.us-east-1.amazonaws.com',
   'https://app-api.execute-api.us-east-1.amazonaws.com?x=1',
   'https://example.com'
@@ -120,7 +120,7 @@ assert.match(missingWebSocket.stderr, /TEAM_FOLLOW_UP_REALTIME_WEBSOCKET_URL/);
 const valid = build({
   TEAM_FOLLOW_UP_COGNITO_USER_POOL_ID: 'us-east-1_Example123',
   TEAM_FOLLOW_UP_COGNITO_CLIENT_ID: 'examplepublicclient123456789',
-  TEAM_FOLLOW_UP_API_BASE_URL: 'https://app-api.execute-api.us-east-1.amazonaws.com',
+  TEAM_FOLLOW_UP_API_BASE_URL: 'https://app-api.execute-api.us-east-1.amazonaws.com/production',
   TEAM_FOLLOW_UP_REALTIME_WEBSOCKET_URL: 'wss://app-realtime.execute-api.us-east-1.amazonaws.com/prod',
   TEAM_FOLLOW_UP_COGNITO_TEAM_USER_ATTRIBUTE: 'custom:teamUserId'
 });
@@ -202,7 +202,7 @@ const config = getRuntimeConfig(output);
 assert.equal(config.cognito.userPoolId, 'us-east-1_Example123');
 assert.equal(config.cognito.userPoolClientId, 'examplepublicclient123456789');
 assert.equal(config.cognito.teamUserAttribute, 'custom:teamUserId');
-assert.equal(config.apiBaseUrl, 'https://app-api.execute-api.us-east-1.amazonaws.com');
+assert.equal(config.apiBaseUrl, 'https://app-api.execute-api.us-east-1.amazonaws.com/production');
 assert.equal(config.realtimeWebSocketUrl, 'wss://app-realtime.execute-api.us-east-1.amazonaws.com/prod');
 assert.ok(!('localAuth' in config), 'runtime config must not contain a local-auth switch');
 assert.ok(!('dataMode' in config), 'runtime config must not contain a database-mode switch');
