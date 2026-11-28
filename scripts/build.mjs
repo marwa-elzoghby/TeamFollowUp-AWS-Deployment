@@ -46,12 +46,12 @@ function validateApiBaseUrl(value) {
     parsed.password ||
     parsed.search ||
     parsed.hash ||
-    !['', '/'].includes(parsed.pathname) ||
+    !['', '/', '/production'].includes(parsed.pathname) ||
     /example\.(com|invalid)$/i.test(parsed.hostname)
   ) {
-    throw new Error(`${required.apiBaseUrl} must be a real HTTPS base URL without credentials, a path, query, or fragment.`);
+    throw new Error(`${required.apiBaseUrl} must be a real HTTPS base URL with no path or the /production stage path, and without credentials, query, or fragment.`);
   }
-  return parsed.origin;
+  return parsed.origin + parsed.pathname.replace(/\/+$/, '');
 }
 
 function validateRealtimeWebSocketUrl(value) {
