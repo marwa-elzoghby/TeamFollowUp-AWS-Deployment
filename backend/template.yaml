@@ -51,6 +51,7 @@ Globals:
         WEBSOCKET_MANAGEMENT_ENDPOINT: !Sub 'https://${RealtimeWebSocketApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
         COGNITO_USER_POOL_ID: !Ref TeamFollowUpUserPool
         COGNITO_CLIENT_ID: !Ref TeamFollowUpAppClient
+        CORS_ALLOWED_ORIGIN: !Sub 'https://${FrontendBranchName}.${FrontendApp.DefaultDomain}'
 
 Resources:
   # Identity resources are created by this template, not supplied as parameters.
