@@ -59,6 +59,10 @@ REALTIME_TABLE = ddb.Table(os.environ['REALTIME_TABLE'])
 WEBSOCKET_MANAGEMENT_ENDPOINT = os.environ.get('WEBSOCKET_MANAGEMENT_ENDPOINT', '').strip()
 COGNITO_USER_POOL_ID = os.environ.get('COGNITO_USER_POOL_ID', '').strip()
 COGNITO_CLIENT_ID = os.environ.get('COGNITO_CLIENT_ID', '').strip()
+CORS_ALLOWED_ORIGIN = os.environ.get(
+    'CORS_ALLOWED_ORIGIN',
+    'https://main.d2598cofhvz56b.amplifyapp.com',
+).strip()
 COGNITO_IDP = boto3.client('cognito-idp')
 
 
@@ -67,15 +71,17 @@ COGNITO_IDP = boto3.client('cognito-idp')
 # ---------------------------------------------------------------------------
 def now():
     return datetime.now(timezone.utc).isoformat(timespec='milliseconds').replace('+00:00','Z')
-def response(status, payload):
+def response(status, payload, extra_headers=None):
     """Build a non-cacheable JSON API response."""
+    headers = {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "x-content-type-options": "nosniff",
+    }
+    headers.update(extra_headers or {})
     return {
         "statusCode": status,
-        "headers": {
-            "content-type": "application/json; charset=utf-8",
-            "cache-control": "no-store",
-            "x-content-type-options": "nosniff",
-        },
+        "headers": headers,
         "body": json.dumps(payload, ensure_ascii=False, default=str),
     }
 
@@ -1510,6 +1516,24 @@ def lambda_handler(event, context):
         or event.get("httpMethod")
         or "GET"
     ).upper()
+    if method == 'OPTIONS':
+        request_headers = {str(key).lower(): str(value) for key, value in (event.get('headers') or {}).items()}
+        origin = request_headers.get('origin', '').strip()
+        allowed_methods = 'GET,POST,PATCH,DELETE,OPTIONS'
+        allowed_headers = 'authorization,content-type'
+        if not CORS_ALLOWED_ORIGIN or origin != CORS_ALLOWED_ORIGIN:
+            return response(403, {'message': 'Origin not allowed.'})
+        return {
+            'statusCode': 204,
+            'headers': {
+                'access-control-allow-origin': CORS_ALLOWED_ORIGIN,
+                'access-control-allow-methods': allowed_methods,
+                'access-control-allow-headers': allowed_headers,
+                'access-control-max-age': '600',
+                'vary': 'Origin',
+            },
+            'body': '',
+        }
     path = unquote(event.get("rawPath") or event.get("path") or "/")
     qs = query(event)
     body = body_of(event)

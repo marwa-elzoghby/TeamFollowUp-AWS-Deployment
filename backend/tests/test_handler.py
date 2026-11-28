@@ -17,12 +17,28 @@ os.environ.setdefault("USERS_TABLE", "UnitTest-Users")
 os.environ.setdefault("ARCHIVE_TABLE", "UnitTest-Archive")
 os.environ.setdefault("REALTIME_TABLE", "UnitTest-Realtime")
 os.environ.setdefault("WEBSOCKET_MANAGEMENT_ENDPOINT", "https://unit-test.execute-api.us-east-1.amazonaws.com/prod")
+os.environ.setdefault("CORS_ALLOWED_ORIGIN", "https://main.d2598cofhvz56b.amplifyapp.com")
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
 import handler  # noqa: E402
 
 
 class HandlerHelperTests(unittest.TestCase):
+    def test_options_preflight_returns_cors_headers_without_authentication(self):
+        event = {
+            "headers": {
+                "Origin": "https://main.d2598cofhvz56b.amplifyapp.com",
+                "Access-Control-Request-Method": "GET",
+                "Access-Control-Request-Headers": "authorization,content-type",
+            },
+            "requestContext": {"http": {"method": "OPTIONS"}},
+        }
+        result = handler.lambda_handler(event, SimpleNamespace(aws_request_id="preflight-test"))
+        self.assertEqual(result["statusCode"], 204)
+        self.assertEqual(result["headers"]["access-control-allow-origin"], "https://main.d2598cofhvz56b.amplifyapp.com")
+        self.assertIn("OPTIONS", result["headers"]["access-control-allow-methods"])
+        self.assertEqual(result["headers"]["access-control-allow-headers"], "authorization,content-type")
+
     def test_restore_summary_is_scheduled_after_the_last_selected_descendant(self):
         ordered = [
             {"itemId": "root-a"},
